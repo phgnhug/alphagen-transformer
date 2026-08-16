@@ -191,7 +191,7 @@ def run_single_experiment(
     save_path = os.path.join("./out/results", name_prefix)
     os.makedirs(save_path, exist_ok=True)
 
-    device = torch.device("cuda:0")
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     close = Feature(FeatureType.CLOSE)
     target = Ref(close, -20) / close - 1
 
@@ -204,10 +204,10 @@ def run_single_experiment(
         )
 
     segments = [
-        ("2012-01-01", "2021-12-31"),
-        ("2022-01-01", "2022-06-30"),
-        ("2022-07-01", "2022-12-31"),
-        ("2023-01-01", "2023-06-30")
+        ("2012-01-01", "2019-12-31"),
+        ("2020-01-01", "2020-04-30"),
+        ("2020-05-01", "2020-07-31"),
+        ("2020-08-01", "2020-09-01")
     ]
     datasets = [get_dataset(*s) for s in segments]
     calculators = [QLibStockDataCalculator(d, target) for d in datasets]

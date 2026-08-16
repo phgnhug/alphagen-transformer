@@ -165,6 +165,10 @@ class DataManager:
         return self._adjust_factors.xs(code, level="code").astype(float)    # type: ignore
 
     def _download_stock_data_job(self, code: str, data: pd.Series) -> None:
+        out_path = f"{self._save_path}/k_data/{code}.pkl"
+        if os.path.exists(out_path):
+            return
+        time.sleep(1)
         fields_str = ",".join(self._fields)
         numeric_fields = self._fields.copy()
         numeric_fields.pop(0)
@@ -174,7 +178,7 @@ class DataManager:
         def query():
             return bs.query_history_k_data_plus(
                 code, fields_str,
-                start_date=data["ipoDate"],
+                start_date=max(data["ipoDate"], "2008-01-01"),
                 adjustflag=("2" if self._use_forward_adjust else "1")
             )
         res = self._query_as_data_frame(query)
@@ -293,7 +297,11 @@ if __name__ == "__main__":
         save_path="../data",
         qlib_export_path="~/.qlib/qlib_data/cn_data_2024h1",
         qlib_base_data_path="~/.qlib/qlib_data/cn_data",
-        adjust_date="2009-01-01"
+        adjust_date="2009-01-01",
+        max_workers=10,
+        retry_wait_seconds=2.
     )
-    dm.fetch_and_save_data()
-    # dm._dump_qlib_data()
+    dm.fetch_and_save_data(
+        use_cached_basic_info=True,
+        use_cached_adjust_factor=True
+    )

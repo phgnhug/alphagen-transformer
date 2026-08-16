@@ -16,7 +16,7 @@ def _mask_either_nan(x: Tensor, y: Tensor, fill_with: float = torch.nan):
 
 def _rank_data_1d(x: Tensor) -> Tensor:
     _, inv, counts = x.unique(return_inverse=True, return_counts=True)
-    cs = counts.cumsum(dim=0)
+    cs = counts.to(torch.int32).cumsum(dim=0)
     cs = torch.cat((torch.zeros(1, dtype=x.dtype, device=x.device), cs))
     rmin = cs[:-1]
     rmax = cs[1:] - 1

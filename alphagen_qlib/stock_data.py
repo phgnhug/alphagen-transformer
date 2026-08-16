@@ -37,7 +37,7 @@ class StockData:
         max_backtrack_days: int = 100,
         max_future_days: int = 30,
         features: Optional[List[FeatureType]] = None,
-        device: torch.device = torch.device("cuda:0"),
+        device: torch.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu"),
         preloaded_data: Optional[Tuple[torch.Tensor, pd.Index, pd.Index]] = None
     ) -> None:
         self._init_qlib()
@@ -69,14 +69,17 @@ class StockData:
         start_index = cal.searchsorted(pd.Timestamp(self._start_time))  # type: ignore
         end_index = cal.searchsorted(pd.Timestamp(self._end_time))  # type: ignore
         real_start_time = cal[start_index - self.max_backtrack_days]
-        if cal[end_index] != pd.Timestamp(self._end_time):
+        if end_index >= len(cal):
+            end_index = len(cal) - 1
+        elif cal[end_index] != pd.Timestamp(self._end_time):
             end_index -= 1
-        real_end_time = cal[end_index + self.max_future_days]
+        real_end_time = cal[min(end_index + self.max_future_days, len(cal) - 1)]
         return (QlibDataLoader(config=exprs)  # type: ignore
                 .load(self._instrument, real_start_time, real_end_time))
 
     def _get_data(self) -> Tuple[torch.Tensor, pd.Index, pd.Index]:
-        features = ['$' + f.name.lower() for f in self._features]
+        _FEATURE_MAP = {'vwap': '($open+$close+$high+$low)/4'}
+        features = [_FEATURE_MAP.get(f.name.lower(), '$' + f.name.lower()) for f in self._features]        
         df = self._load_exprs(features)
         df = df.stack().unstack(level=1)
         dates = df.index.levels[0]                                      # type: ignore
