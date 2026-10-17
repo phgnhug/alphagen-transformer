@@ -1,0 +1,27 @@
+AlphaGen LSTM Baseline — Seed 0
+Date: 2026-09-29
+Status: Training finished; metrics verified from TensorBoard.
+
+Total timesteps: 251904
+Best IC-ret: 0.0989116803
+Evaluation count: 17651
+Significant alphas: 20
+Pool size: 20
+Mean episode reward: 0.05495552
+
+IC 1: 0.19225143
+IC 2: 0.07474641
+IC 3: 0.20340052
+Mean IC: 0.14520933
+
+Rank IC 1: 0.18321893
+Rank IC 2: 0.10399533
+Rank IC 3: 0.18228450
+Mean Rank IC: 0.15093903
+
+TensorBoard:
+out/tensorboard/csi300_20_0_20260928205046_rl_1/
+
+Scope: Training and alpha-pool metrics only.
+Portfolio return, Sharpe ratio, drawdown, and turnover have not
+been verified from this record.
