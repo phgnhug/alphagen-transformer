@@ -314,7 +314,7 @@ class MseAlphaPool(LinearAlphaPool):
                 tolerance_count += 1
     
             if loss_ic_curr < loss_ic_min:
-                best_weights = weights
+                best_weights = weights.detach().clone()
                 loss_ic_min = loss_ic_curr
     
             if tolerance_count >= tolerance or step >= max_steps:
@@ -327,6 +327,38 @@ class MseAlphaPool(LinearAlphaPool):
             return np.linalg.lstsq(self._mutual_ics[:self.size, :self.size],self.single_ics[:self.size])[0]
         except (np.linalg.LinAlgError, ValueError):
             return self.weights
+
+
+class KddAlphaPool(MseAlphaPool):
+    """
+    Follows the pool update rule of the KDD 2023 paper's code (`AlphaPool` at commit e3b1526):
+    - a new alpha's initial weight is its own IC;
+    - if the new alpha would be the one dropped, the old weights are kept, and the pool
+      still drops the alpha with the smallest |weight| (no failure cache);
+    - the reward is always the ensemble IC of the resulting pool.
+    """
+
+    def try_new_expr(self, expr: Expression) -> float:
+        ic_ret, ic_mut = self._calc_ics(expr, ic_mut_threshold=0.99)
+        if ic_ret is None or ic_mut is None or np.isnan(ic_ret) or np.isnan(ic_mut).any():
+            return 0.
+
+        self.eval_cnt += 1
+        self._add_factor(expr, ic_ret, ic_mut)
+        if self.size > 1:
+            new_weights = self.optimize()
+            worst_idx = int(np.argmin(np.abs(new_weights)))
+            if worst_idx != self.capacity:
+                self.weights = new_weights
+            self._pop()
+
+        new_ic_ret, new_obj = self.calculate_ic_and_objective()
+        self._maybe_update_best(new_ic_ret, new_obj)
+        return new_ic_ret
+
+    def _add_factor(self, expr: Expression, ic_ret: float, ic_mut: List[float]):
+        super()._add_factor(expr, ic_ret, ic_mut)
+        self._weights[self.size - 1] = ic_ret
 
 
 # Note: Currently the weights are only updated when the new IC is higher.

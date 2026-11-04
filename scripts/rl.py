@@ -15,7 +15,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from alphagen.data.expression import *
 from alphagen.data.parser import ExpressionParser
-from alphagen.models.linear_alpha_pool import LinearAlphaPool, MseAlphaPool
+from alphagen.models.linear_alpha_pool import LinearAlphaPool, KddAlphaPool
 from alphagen.rl.env.wrapper import AlphaEnv
 from alphagen.rl.policy import LSTMSharedNet
 from alphagen.utils import reseed_everything, get_logger
@@ -106,6 +106,7 @@ class CustomCallback(BaseCallback):
     def __init__(
         self,
         save_path: str,
+        valid_calculator: QLibStockDataCalculator,
         test_calculators: List[QLibStockDataCalculator],
         verbose: int = 0,
         chat_session: Optional[InterativeSession] = None,
@@ -115,6 +116,7 @@ class CustomCallback(BaseCallback):
         super().__init__(verbose)
 
         self.save_path = save_path
+        self.valid_calculator = valid_calculator
         self.test_calculators = test_calculators
 
         os.makedirs(
@@ -171,6 +173,22 @@ class CustomCallback(BaseCallback):
         self.logger.record(
             "pool/eval_cnt",
             self.pool.eval_cnt
+        )
+
+        ic_valid, rank_ic_valid = (
+            self.pool.test_ensemble(
+                self.valid_calculator
+            )
+        )
+
+        self.logger.record(
+            "valid/ic",
+            ic_valid
+        )
+
+        self.logger.record(
+            "valid/rank_ic",
+            rank_ic_valid
         )
 
         n_days = sum(
@@ -396,7 +414,7 @@ def run_single_experiment(
     # --------------------------------------------------------
 
     initialize_qlib(
-        "~/.qlib/qlib_data/cn_data_2024h1"
+        "~/.qlib/qlib_data/cn_data_2023ref"
     )
 
     # --------------------------------------------------------
@@ -465,7 +483,9 @@ def run_single_experiment(
     # --------------------------------------------------------
 
     device = torch.device(
-        "mps"
+        "cuda:0"
+        if torch.cuda.is_available()
+        else "mps"
         if torch.backends.mps.is_available()
         else "cpu"
     )
@@ -502,22 +522,19 @@ def run_single_experiment(
             device=device
         )
 
+    # Paper (KDD 2023) split: train 2009-2018, validation 2019, test 2020-2021
     segments = [
         (
-            "2012-01-01",
+            "2009-01-01",
+            "2018-12-31"
+        ),
+        (
+            "2019-01-01",
             "2019-12-31"
         ),
         (
             "2020-01-01",
-            "2020-04-30"
-        ),
-        (
-            "2020-05-01",
-            "2020-07-31"
-        ),
-        (
-            "2020-08-01",
-            "2020-09-01"
+            "2021-12-31"
         )
     ]
 
@@ -542,7 +559,7 @@ def run_single_experiment(
         exprs: List[Expression]
     ) -> LinearAlphaPool:
 
-        pool = MseAlphaPool(
+        pool = KddAlphaPool(
             capacity=pool_capacity,
             calculator=calculators[0],
             ic_lower_bound=None,
@@ -585,7 +602,7 @@ def run_single_experiment(
             chat,
             build_pool,
             calculator_train=calculators[0],
-            calculators_test=calculators[1:],
+            calculators_test=calculators[2:],
             replace_k=llm_replace_n,
             forgetful=True
         )
@@ -705,7 +722,8 @@ def run_single_experiment(
 
     checkpoint_callback = CustomCallback(
         save_path=save_path,
-        test_calculators=calculators[1:],
+        valid_calculator=calculators[1],
+        test_calculators=calculators[2:],
         verbose=1,
         chat_session=inter,
         llm_every_n_steps=llm_every_n_steps,
@@ -835,11 +853,12 @@ def main(
             random_seeds,
         )
 
+    # Steps per pool size from the paper's code (train_maskable_ppo.py, commit e3b1526)
     default_steps = {
-        10: 200_000,
-        20: 250_000,
-        50: 300_000,
-        100: 350_000
+        10: 250_000,
+        20: 300_000,
+        50: 350_000,
+        100: 400_000
     }
 
     for s in random_seeds:

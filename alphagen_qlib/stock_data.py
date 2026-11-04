@@ -14,7 +14,7 @@ class FeatureType(IntEnum):
     VWAP = 5
 
 
-_DEFAULT_QLIB_DATA_PATH = "~/.qlib/qlib_data/cn_data_2024h1"
+_DEFAULT_QLIB_DATA_PATH = "~/.qlib/qlib_data/cn_data_2023ref"
 _QLIB_INITIALIZED = False
 
 
@@ -37,7 +37,8 @@ class StockData:
         max_backtrack_days: int = 100,
         max_future_days: int = 30,
         features: Optional[List[FeatureType]] = None,
-        device: torch.device = torch.device("mps" if torch.backends.mps.is_available() else "cpu"),
+        device: torch.device = torch.device(
+            "cuda:0" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"),
         preloaded_data: Optional[Tuple[torch.Tensor, pd.Index, pd.Index]] = None
     ) -> None:
         self._init_qlib()
@@ -78,8 +79,7 @@ class StockData:
                 .load(self._instrument, real_start_time, real_end_time))
 
     def _get_data(self) -> Tuple[torch.Tensor, pd.Index, pd.Index]:
-        _FEATURE_MAP = {'vwap': '($open+$close+$high+$low)/4'}
-        features = [_FEATURE_MAP.get(f.name.lower(), '$' + f.name.lower()) for f in self._features]        
+        features = ['$' + f.name.lower() for f in self._features]
         df = self._load_exprs(features)
         df = df.stack().unstack(level=1)
         dates = df.index.levels[0]                                      # type: ignore
