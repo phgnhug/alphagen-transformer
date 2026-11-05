@@ -10,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import baostock as bs
 from baostock.data.resultset import ResultData
+import baostock.common.contants as bs_cons
 from baostock_utils import baostock_login_context, baostock_relogin, baostock_login
 
 from qlib_dump_bin import DumpDataAll
@@ -232,17 +233,32 @@ class DataManager:
 
     def _query_as_data_frame(self, query: Callable[[], ResultData]) -> pd.DataFrame:
         retries = 0
+        suspect_len = None
+        error = ""
         while True:
             rows = []
-            result = query()
-            while result.error_code == "0":
-                if not result.next():
-                    return pd.DataFrame(rows, columns=result.fields)
-                rows.append(result.get_row_data())
+            try:
+                result = query()
+                while result.error_code == "0":
+                    # next() also fetches the following page and returns False when that fetch fails,
+                    # sometimes without setting error_code (empty reply), so a result that ends exactly
+                    # on a page boundary may be truncated: accept it once a second query agrees
+                    if not result.next():
+                        if result.error_code != "0":
+                            break
+                        page = int(bs_cons.BAOSTOCK_PER_PAGE_COUNT)
+                        if len(rows) > 0 and len(rows) % page == 0 and suspect_len != len(rows):
+                            suspect_len = len(rows)
+                            break
+                        return pd.DataFrame(rows, columns=result.fields)
+                    rows.append(result.get_row_data())
+                error = f"error code: {result.error_code}, error message: {result.error_msg}"
+            except Exception as e:
+                # A garbled reply can make baostock itself raise while parsing it
+                error = f"exception: {e!r}"
             retries += 1
             if retries > self._max_retries:
-                msg = (f"Retry attempts exceeds the limit of {self._max_retries}, "
-                       f"error code: {result.error_code}, error message: {result.error_msg}")
+                msg = f"Retry attempts exceeds the limit of {self._max_retries}, {error}"
                 print(msg)
                 raise Exception(msg)
             time.sleep(self._retry_wait_seconds)

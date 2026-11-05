@@ -467,6 +467,9 @@ def run_single_experiment(
         f"{timestamp}_"
         f"{tag}"
     )
+    # Optional suffix that keeps experiment variants apart (results dir, resume lookup, TensorBoard)
+    if os.environ.get("RUN_TAG"):
+        name_prefix += f"_{os.environ['RUN_TAG']}"
 
     save_path = os.path.join(
         "./out/results",

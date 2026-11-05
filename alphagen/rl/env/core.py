@@ -2,7 +2,7 @@ from typing import Tuple, Optional
 import gymnasium as gym
 import math
 
-from alphagen.config import MAX_EXPR_LENGTH
+from alphagen.config import MAX_EXPR_LENGTH, INVALID_EXPR_REWARD
 from alphagen.data.tokens import *
 from alphagen.data.expression import *
 from alphagen.data.tree import ExpressionBuilder
@@ -57,7 +57,7 @@ class AlphaEnvCore(gym.Env):
             reward = 0.0
         else:
             done = True
-            reward = self._evaluate() if self._builder.is_valid() else -1.
+            reward = self._evaluate() if self._builder.is_valid() else INVALID_EXPR_REWARD
 
         if math.isnan(reward):
             reward = 0.
