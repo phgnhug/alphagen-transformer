@@ -3,8 +3,8 @@
 Reproduction of AlphaGen (Yu et al., KDD 2023, arXiv 2306.12964) on the ICM Rysy cluster,
 with the paper's data split, target, hyperparameters and step count.
 
-Status on 2026-11-06 22:40: CSI300 complete (10 seeds), reward-0 test complete (3 seeds),
-CSI500 7 of 10 seeds finished (seeds 6, 8, 9 still training).
+Status on 2026-11-07 03:00: CSI300 complete (10 seeds), reward-0 test complete (3 seeds),
+CSI500 complete (10 seeds). Pool sizes 10, 50 and 100 on CSI300 are training.
 
 ## Setup
 
@@ -60,10 +60,10 @@ Paper (KDD 2023, Table 2, row "Ours*"), mean (std) over 10 runs:
 | | CSI300 IC | CSI300 Rank IC | CSI500 IC | CSI500 Rank IC |
 |---|---|---|---|---|
 | Paper | 0.0725 (0.0105) | 0.0806 (0.0106) | 0.0438 (0.0064) | 0.0727 (0.0112) |
-| This reproduction | 0.0521 (0.0128) | 0.0587 (0.0167) | 0.0316 (0.0078), 7 seeds | 0.0406 (0.0053), 7 seeds |
-| Ratio | 72% | 73% | 72% | 56% |
+| This reproduction | 0.0521 (0.0128) | 0.0587 (0.0167) | 0.0323 (0.0069) | 0.0430 (0.0062) |
+| Ratio | 72% | 73% | 74% | 59% |
 
-- On both universes the IC is about 72% of the paper's. The best CSI300 seed (8) matches the
+- On both universes the IC is about three quarters of the paper's. The best CSI300 seed (8) matches the
   paper's mean.
 - Our seed spread (std 0.013) is close to the paper's (0.011), so the runs behave similarly; but
   with a standard error of about 0.004 the gap of 0.020 on CSI300 is not seed noise.
@@ -103,13 +103,13 @@ Same setup, `INDEX=csi500` (jobs 214954 and 214969).
 | 3 | 0.0193 | 0.0354 | -0.0188 | -0.0201 | 6.42 |
 | 4 | 0.0348 | 0.0384 | 0.0073 | -0.0043 | 4.12 |
 | 5 | 0.0294 | 0.0338 | 0.0001 | -0.0054 | 9.76 |
-| 6 | running | | | | |
+| 6 | 0.0299 | 0.0471 | 0.0085 | 0.0025 | 6.10 |
 | 7 | 0.0442 | 0.0451 | -0.0150 | -0.0206 | 5.11 |
-| 8 | running | | | | |
-| 9 | running | | | | |
-| **Mean ± std (7 seeds)** | **0.0316 ± 0.0078** | **0.0406 ± 0.0053** | -0.0004 ± 0.0162 | -0.0055 ± 0.0148 | 6.11 |
+| 8 | 0.0398 | 0.0534 | 0.0130 | 0.0115 | 4.42 |
+| 9 | 0.0320 | 0.0457 | 0.0099 | 0.0031 | 5.46 |
+| **Mean ± std (10 seeds)** | **0.0323 ± 0.0069** | **0.0430 ± 0.0062** | 0.0028 ± 0.0143 | -0.0021 ± 0.0135 | 5.88 |
 
-The Rank IC gap is larger on CSI500 (56% of the paper) than the IC gap (72%).
+The Rank IC gap is larger on CSI500 (59% of the paper) than the IC gap (74%).
 
 ## Caveats
 
@@ -124,12 +124,13 @@ The Rank IC gap is larger on CSI500 (56% of the paper) than the IC gap (72%).
 
 ## Next steps
 
-1. Pool sizes 10, 50 and 100 on CSI300 (the paper reports the best of the four).
-2. Finish CSI500 seeds 6, 8, 9.
+1. Pool sizes 10, 50 and 100 on CSI300 (the paper reports the best of the four): running since
+   2026-11-06 23:00, seeds 0–4 of pool 100 and 50 and seeds 0–1 of pool 10 (jobs 215001–215003).
+   Pool 100 runs at about 6 steps/s, so 400k steps take about 19 h.
 
 ## Files
 
 - `pools/seed<N>_301056_steps_pool.json`: final CSI300 alpha pool of each seed (20 expressions and weights)
 - `pools/seed<N>_r0_301056_steps_pool.json`: final pools of the reward-0 runs, seeds 0–2
-- `pools_csi500/seed<N>_301056_steps_pool.json`: final CSI500 pools of the finished seeds
+- `pools_csi500/seed<N>_301056_steps_pool.json`: final CSI500 pool of each seed
 - `pools_olddata/seed{0,1,2}.json`: final pools of the earlier runs on the uncorrected data
