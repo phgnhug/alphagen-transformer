@@ -33,7 +33,7 @@ class AlphaEnvWrapper(gym.Wrapper):
         self.size_action = SIZE_ACTION + len(self.subexprs)
         self.action_space = gym.spaces.Discrete(self.size_action)
         self.observation_space = gym.spaces.Box(
-            low=0, high=self.size_action + SIZE_NULL - 1,
+            low=0, high=self.size_action + SIZE_NULL - 1,   # also covers action + OBS_OFFSET
             shape=(MAX_EXPR_LENGTH, ),
             dtype=np.uint8
         )
@@ -47,7 +47,7 @@ class AlphaEnvWrapper(gym.Wrapper):
     def step(self, action: int):
         _, reward, done, truncated, info = self.env.step(self.action(action))
         if not done:
-            self.state[self.counter] = action
+            self.state[self.counter] = action + OBS_OFFSET
             self.counter += 1
         return self.state, self.reward(reward), done, truncated, info
 

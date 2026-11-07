@@ -17,7 +17,8 @@ from alphagen.data.expression import *
 from alphagen.data.parser import ExpressionParser
 from alphagen.models.linear_alpha_pool import LinearAlphaPool, KddAlphaPool
 from alphagen.rl.env.wrapper import AlphaEnv
-from alphagen.rl.policy import LSTMSharedNet
+from alphagen.config import OBS_OFFSET
+from alphagen.rl.policy import LSTMSharedNet, TransformerSharedNet
 from alphagen.utils import reseed_everything, get_logger
 from alphagen.rl.env.core import AlphaEnvCore
 
@@ -765,17 +766,25 @@ def run_single_experiment(
             "\n[Main] Creating new PPO model..."
         )
 
+        # ALPHAGEN_POLICY=transformer swaps the paper's LSTM for a transformer of similar size
+        policy_name = os.environ.get("ALPHAGEN_POLICY", "lstm")
+        if policy_name == "lstm":
+            extractor_class = LSTMSharedNet
+            extractor_kwargs = dict(n_layers=2, d_model=128, dropout=0.1, device=device)
+        elif policy_name == "transformer":
+            extractor_class = TransformerSharedNet
+            extractor_kwargs = dict(n_encoder_layers=2, d_model=128, n_head=4, d_ffn=512,
+                                    dropout=0.1, device=device)
+        else:
+            raise ValueError(f"Unknown ALPHAGEN_POLICY {policy_name!r}")
+        print(f"[Main] Policy {policy_name}, observation offset {OBS_OFFSET}")
+
         model = MaskablePPO(
             "MlpPolicy",
             env,
             policy_kwargs=dict(
-                features_extractor_class=LSTMSharedNet,
-                features_extractor_kwargs=dict(
-                    n_layers=2,
-                    d_model=128,
-                    dropout=0.1,
-                    device=device,
-                ),
+                features_extractor_class=extractor_class,
+                features_extractor_kwargs=extractor_kwargs,
             ),
             gamma=1.,
             ent_coef=0.01,

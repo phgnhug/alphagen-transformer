@@ -64,7 +64,9 @@ class TransformerSharedNet(BaseFeaturesExtractor):
         pad_mask = obs == 0
         src = self._pos_enc(self._token_emb(obs))
         res = self._transformer(src, src_key_padding_mask=pad_mask)
-        return res.mean(dim=1)
+        # Mean over the real tokens only; padded positions still produce outputs
+        keep = (~pad_mask).unsqueeze(-1).to(res.dtype)
+        return (res * keep).sum(dim=1) / keep.sum(dim=1)
 
 
 class LSTMSharedNet(BaseFeaturesExtractor):

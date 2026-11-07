@@ -29,3 +29,6 @@ REWARD_PER_STEP = 0.
 # Reward for an expression that hits MAX_EXPR_LENGTH unfinished: the paper text says -1,
 # the paper's code (commit e3b1526) uses 0
 INVALID_EXPR_REWARD = float(os.environ.get("ALPHAGEN_INVALID_REWARD", "-1"))
+# Observations store action ids with 0 as padding, so action 0 (Abs) looks like padding to the
+# policy nets (paper's code). 1 stores action + 1 instead, keeping 0 for padding only.
+OBS_OFFSET = int(os.environ.get("ALPHAGEN_OBS_OFFSET", "0"))
