@@ -3,8 +3,9 @@
 Reproduction of AlphaGen (Yu et al., KDD 2023, arXiv 2306.12964) on the ICM Rysy cluster,
 with the paper's data split, target, hyperparameters and step count.
 
-Status on 2026-11-07 03:00: CSI300 complete (10 seeds), reward-0 test complete (3 seeds),
-CSI500 complete (10 seeds). Pool sizes 10, 50 and 100 on CSI300 are training.
+Status on 2026-11-09 12:00: CSI300 complete (10 seeds), reward-0 test complete (3 seeds),
+CSI500 complete (10 seeds), pool sizes 10 / 50 / 100 on CSI300 done for seeds 0–1 / 0–4 / 0–4
+(pool 100 seeds 5–9 training), first transformer runs done (seeds 0–2).
 
 ## Setup
 
@@ -67,9 +68,9 @@ Paper (KDD 2023, Table 2, row "Ours*"), mean (std) over 10 runs:
   paper's mean.
 - Our seed spread (std 0.013) is close to the paper's (0.011), so the runs behave similarly; but
   with a standard error of about 0.004 the gap of 0.020 on CSI300 is not seed noise.
-- **The paper's "Ours\*" is the best of pool sizes {10, 20, 50, 100}** for each universe. We ran
-  only pool size 20, so part of the gap may come from choosing a larger pool. This is the most
-  direct next experiment.
+- **The paper's "Ours\*" is the best of pool sizes {10, 20, 50, 100}** for each universe. The table
+  above is pool size 20 only. With pool size 100 (5 seeds so far, next section) CSI300 reaches
+  0.0617 / 0.0677, **85% / 84%** of the paper, so pool size explains about half of the gap.
 - Otherwise the training code matches the authors' KDD version (commit e3b1526) except for the
   reward for unfinished expressions, which turns out not to matter (next section). Remaining
   candidates: data source and membership details, library versions.
@@ -111,6 +112,57 @@ Same setup, `INDEX=csi500` (jobs 214954 and 214969).
 
 The Rank IC gap is larger on CSI500 (59% of the paper) than the IC gap (74%).
 
+## Pool size (CSI300)
+
+Same setup with pool capacity 10, 50 and 100 and the step counts of the authors' code
+(250k / 350k / 400k; jobs 215001–215003). Seed-matched means, test 2020–2021:
+
+| Pool size | Seeds | Test IC | Test Rank IC | Same seeds at pool 20 (IC / Rank IC) |
+|---|---|---|---|---|
+| 10 | 0–1 | 0.0377 ± 0.0006 | 0.0546 ± 0.0001 | 0.0515 / 0.0579 |
+| 20 | 0–4 | 0.0542 | 0.0589 | — |
+| 50 | 0–4 | 0.0577 ± 0.0181 | 0.0639 ± 0.0171 | 0.0542 / 0.0589 |
+| 100 | 0–4 | **0.0617 ± 0.0108** | **0.0677 ± 0.0074** | 0.0542 / 0.0589 |
+
+Per seed (test IC / Rank IC):
+
+| Seed | Pool 10 | Pool 50 | Pool 100 |
+|---|---|---|---|
+| 0 | 0.0372 / 0.0546 | 0.0610 / 0.0741 | 0.0749 / 0.0780 |
+| 1 | 0.0381 / 0.0545 | 0.0393 / 0.0487 | 0.0548 / 0.0605 |
+| 2 | | 0.0429 / 0.0494 | 0.0717 / 0.0725 |
+| 3 | | 0.0607 / 0.0591 | 0.0513 / 0.0655 |
+| 4 | | 0.0848 / 0.0883 | 0.0560 / 0.0620 |
+
+- IC rises with pool size, as in the paper, and pool 100 is the best of the four, so it is the
+  setting to compare with "Ours\*". Seeds 5–9 at pool 100 are training (job 215199).
+- Pool 100 runs take 18–24 h on a V100, against 7–12 h at pool 20.
+
+## Transformer policy (first results)
+
+`ALPHAGEN_POLICY=transformer` replaces the LSTM with `TransformerSharedNet` of similar size
+(2 layers, d_model 128, 4 heads, feed-forward 512, dropout 0.1; 403k parameters against 271k).
+Two fixes are switched on for it (`ALPHAGEN_OBS_OFFSET=1`):
+
+- The transformer's output is averaged over real tokens only; the original averaged over all
+  21 positions, so padding dominated short expressions.
+- Observations stored action ids with 0 as padding, so action 0 (`Abs`) was invisible to the
+  policy; for the LSTM, using `Abs` also hid the last token. Actions are now stored as id + 1.
+  This bug is in the authors' code, so all LSTM results above have it.
+
+Pool 20, CSI300, `RUN_TAG=tf` (job 215023):
+
+| Seed | Transformer + fix: test IC / Rank IC | LSTM (paper code): test IC / Rank IC |
+|---|---|---|
+| 0 | 0.0467 / 0.0395 | 0.0574 / 0.0706 |
+| 1 | 0.0486 / 0.0576 | 0.0456 / 0.0452 |
+| 2 | 0.0320 / 0.0208 | 0.0437 / 0.0410 |
+| **Mean** | **0.0424 / 0.0393** | **0.0489 / 0.0523** |
+
+Three seeds are not enough to conclude, and the comparison mixes the policy change with the
+observation fix. Running now: the LSTM with the fix (`RUN_TAG=fix`, seeds 0–4, job 215200) to
+separate the two, and transformer seeds 3–4 (job 215201).
+
 ## Caveats
 
 - Validation IC on 2019 is close to zero for many seeds while test IC is positive, so the
@@ -124,13 +176,15 @@ The Rank IC gap is larger on CSI500 (59% of the paper) than the IC gap (74%).
 
 ## Next steps
 
-1. Pool sizes 10, 50 and 100 on CSI300 (the paper reports the best of the four): running since
-   2026-11-06 23:00, seeds 0–4 of pool 100 and 50 and seeds 0–1 of pool 10 (jobs 215001–215003).
-   Pool 100 runs at about 6 steps/s, so 400k steps take about 19 h.
+1. Pool 100 seeds 5–9 on CSI300, for a 10-seed best-pool result (running).
+2. LSTM with the observation fix and transformer seeds 3–4 (running), then the transformer at
+   the best pool size and on CSI500.
 
 ## Files
 
 - `pools/seed<N>_301056_steps_pool.json`: final CSI300 alpha pool of each seed (20 expressions and weights)
 - `pools/seed<N>_r0_301056_steps_pool.json`: final pools of the reward-0 runs, seeds 0–2
 - `pools_csi500/seed<N>_301056_steps_pool.json`: final CSI500 pool of each seed
+- `pools_poolsize/pool<P>_seed<N>_<steps>_steps_pool.json`: final CSI300 pools at pool sizes 10, 50, 100
+- `pools_transformer/seed<N>_301056_steps_pool.json`: final pools of the transformer runs
 - `pools_olddata/seed{0,1,2}.json`: final pools of the earlier runs on the uncorrected data
