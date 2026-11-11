@@ -3,9 +3,9 @@
 Reproduction of AlphaGen (Yu et al., KDD 2023, arXiv 2306.12964) on the ICM Rysy cluster,
 with the paper's data split, target, hyperparameters and step count.
 
-Status on 2026-11-09 12:00: CSI300 complete (10 seeds), reward-0 test complete (3 seeds),
-CSI500 complete (10 seeds), pool sizes 10 / 50 / 100 on CSI300 done for seeds 0–1 / 0–4 / 0–4
-(pool 100 seeds 5–9 training), first transformer runs done (seeds 0–2).
+Status on 2026-11-11 11:30: CSI300 complete at pool 20 and pool 100 (10 seeds each), CSI500
+complete at pool 20 (10 seeds), reward-0 test complete (3 seeds), transformer and fixed-LSTM
+runs done for seeds 0–4. CSI500 at pool 100 and fixed-LSTM seeds 5–9 are training.
 
 ## Setup
 
@@ -69,8 +69,8 @@ Paper (KDD 2023, Table 2, row "Ours*"), mean (std) over 10 runs:
 - Our seed spread (std 0.013) is close to the paper's (0.011), so the runs behave similarly; but
   with a standard error of about 0.004 the gap of 0.020 on CSI300 is not seed noise.
 - **The paper's "Ours\*" is the best of pool sizes {10, 20, 50, 100}** for each universe. The table
-  above is pool size 20 only. With pool size 100 (5 seeds so far, next section) CSI300 reaches
-  0.0617 / 0.0677, **85% / 84%** of the paper, so pool size explains about half of the gap.
+  above is pool size 20 only. With pool size 100 (10 seeds, next section) CSI300 reaches
+  0.0592 / 0.0636, **82% / 79%** of the paper, so pool size explains about a third of the gap.
 - Otherwise the training code matches the authors' KDD version (commit e3b1526) except for the
   reward for unfinished expressions, which turns out not to matter (next section). Remaining
   candidates: data source and membership details, library versions.
@@ -123,6 +123,7 @@ Same setup with pool capacity 10, 50 and 100 and the step counts of the authors'
 | 20 | 0–4 | 0.0542 | 0.0589 | — |
 | 50 | 0–4 | 0.0577 ± 0.0181 | 0.0639 ± 0.0171 | 0.0542 / 0.0589 |
 | 100 | 0–4 | **0.0617 ± 0.0108** | **0.0677 ± 0.0074** | 0.0542 / 0.0589 |
+| 100 | 0–9 | **0.0592 ± 0.0085** | **0.0636 ± 0.0086** | 0.0521 / 0.0587 |
 
 Per seed (test IC / Rank IC):
 
@@ -133,9 +134,16 @@ Per seed (test IC / Rank IC):
 | 2 | | 0.0429 / 0.0494 | 0.0717 / 0.0725 |
 | 3 | | 0.0607 / 0.0591 | 0.0513 / 0.0655 |
 | 4 | | 0.0848 / 0.0883 | 0.0560 / 0.0620 |
+| 5 | | | 0.0563 / 0.0627 |
+| 6 | | | 0.0587 / 0.0555 |
+| 7 | | | 0.0479 / 0.0484 |
+| 8 | | | 0.0566 / 0.0601 |
+| 9 | | | 0.0636 / 0.0709 |
 
 - IC rises with pool size, as in the paper, and pool 100 is the best of the four, so it is the
-  setting to compare with "Ours\*". Seeds 5–9 at pool 100 are training (job 215199).
+  setting to compare with "Ours\*": 0.0592 ± 0.0085 / 0.0636 ± 0.0086 over 10 seeds (seeds 5–9:
+  job 215199), 82% / 79% of the paper. Pool 100 also has the smallest seed spread.
+- CSI500 at pool 100 is training (jobs 215208, 215411).
 - Pool 100 runs take 18–24 h on a V100, against 7–12 h at pool 20.
 
 ## Transformer policy (first results)
@@ -150,18 +158,27 @@ Two fixes are switched on for it (`ALPHAGEN_OBS_OFFSET=1`):
   policy; for the LSTM, using `Abs` also hid the last token. Actions are now stored as id + 1.
   This bug is in the authors' code, so all LSTM results above have it.
 
-Pool 20, CSI300, `RUN_TAG=tf` (job 215023):
+Pool 20, CSI300, test IC / Rank IC. Transformer `RUN_TAG=tf` (jobs 215023, 215201); LSTM with
+the observation fix `RUN_TAG=fix` (job 215200), as the control for the fix:
 
-| Seed | Transformer + fix: test IC / Rank IC | LSTM (paper code): test IC / Rank IC |
-|---|---|---|
-| 0 | 0.0467 / 0.0395 | 0.0574 / 0.0706 |
-| 1 | 0.0486 / 0.0576 | 0.0456 / 0.0452 |
-| 2 | 0.0320 / 0.0208 | 0.0437 / 0.0410 |
-| **Mean** | **0.0424 / 0.0393** | **0.0489 / 0.0523** |
+| Seed | LSTM (paper code) | LSTM + fix | Transformer + fix |
+|---|---|---|---|
+| 0 | 0.0574 / 0.0706 | 0.0341 / 0.0314 | 0.0467 / 0.0395 |
+| 1 | 0.0456 / 0.0452 | 0.0331 / 0.0460 | 0.0486 / 0.0576 |
+| 2 | 0.0437 / 0.0410 | 0.0551 / 0.0593 | 0.0320 / 0.0208 |
+| 3 | 0.0687 / 0.0790 | 0.0447 / 0.0438 | 0.0490 / 0.0594 |
+| 4 | 0.0554 / 0.0588 | 0.0266 / 0.0475 | 0.0656 / 0.0728 |
+| **Mean** | **0.0542 / 0.0589** | **0.0387 / 0.0456** | **0.0484 / 0.0500** |
 
-Three seeds are not enough to conclude, and the comparison mixes the policy change with the
-observation fix. Running now: the LSTM with the fix (`RUN_TAG=fix`, seeds 0–4, job 215200) to
-separate the two, and transformer seeds 3–4 (job 215201).
+Paired over seeds 0–4 (test IC):
+
+- **The observation fix lowers the LSTM's IC**, by 0.0154 on average, on 4 of 5 seeds (paired
+  t-test p = 0.10). This is unexpected: making `Abs` visible should not hurt. Seeds 5–9 of the
+  fixed LSTM are running (job 215412) to see whether it holds.
+- **With the fix on both, the transformer beats the LSTM** by 0.0097, on 4 of 5 seeds (p = 0.39).
+- Against the paper's LSTM without the fix, the transformer is 0.0058 lower (3 of 5 seeds, p = 0.35).
+- None of these differences is significant with 5 seeds; the seed spread (std about 0.011) is
+  as large as the effects.
 
 ## Caveats
 
@@ -176,9 +193,10 @@ separate the two, and transformer seeds 3–4 (job 215201).
 
 ## Next steps
 
-1. Pool 100 seeds 5–9 on CSI300, for a 10-seed best-pool result (running).
-2. LSTM with the observation fix and transformer seeds 3–4 (running), then the transformer at
-   the best pool size and on CSI500.
+1. CSI500 at pool 100, 10 seeds (running), to finish the reproduction on both universes.
+2. Fixed LSTM seeds 5–9 (running), to settle whether the observation fix matters.
+3. Main comparison: LSTM vs transformer at pool 100, 10 seeds each, on CSI300 then CSI500,
+   with the observation setting chosen after step 2.
 
 ## Files
 
@@ -187,4 +205,5 @@ separate the two, and transformer seeds 3–4 (job 215201).
 - `pools_csi500/seed<N>_301056_steps_pool.json`: final CSI500 pool of each seed
 - `pools_poolsize/pool<P>_seed<N>_<steps>_steps_pool.json`: final CSI300 pools at pool sizes 10, 50, 100
 - `pools_transformer/seed<N>_301056_steps_pool.json`: final pools of the transformer runs
+- `pools_fix/seed<N>_301056_steps_pool.json`: final pools of the LSTM runs with the observation fix
 - `pools_olddata/seed{0,1,2}.json`: final pools of the earlier runs on the uncorrected data
