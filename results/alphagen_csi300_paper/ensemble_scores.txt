@@ -1,0 +1,182 @@
+
+== pool20: 10 pools
+  valid seed0_301056_steps_pool.json               IC 0.0411  RankIC 0.0512
+  valid seed1_301056_steps_pool.json               IC -0.0161  RankIC -0.0056
+  valid seed2_301056_steps_pool.json               IC 0.0193  RankIC 0.0287
+  valid seed3_301056_steps_pool.json               IC 0.0097  RankIC 0.0220
+  valid seed4_301056_steps_pool.json               IC 0.0524  RankIC 0.0514
+  valid seed5_301056_steps_pool.json               IC -0.0213  RankIC -0.0110
+  valid seed6_301056_steps_pool.json               IC 0.0083  RankIC 0.0259
+  valid seed7_301056_steps_pool.json               IC -0.0136  RankIC 0.0076
+  valid seed8_301056_steps_pool.json               IC 0.0355  RankIC 0.0536
+  valid seed9_301056_steps_pool.json               IC 0.0397  RankIC 0.0431
+  valid MEAN OF SEEDS  IC 0.0155  RankIC 0.0267   BEST SEED IC 0.0524
+  valid ENSEMBLE       IC 0.0213  RankIC 0.0327
+  test seed0_301056_steps_pool.json               IC 0.0574  RankIC 0.0706
+  test seed1_301056_steps_pool.json               IC 0.0456  RankIC 0.0452
+  test seed2_301056_steps_pool.json               IC 0.0437  RankIC 0.0410
+  test seed3_301056_steps_pool.json               IC 0.0687  RankIC 0.0790
+  test seed4_301056_steps_pool.json               IC 0.0554  RankIC 0.0588
+  test seed5_301056_steps_pool.json               IC 0.0509  RankIC 0.0517
+  test seed6_301056_steps_pool.json               IC 0.0570  RankIC 0.0639
+  test seed7_301056_steps_pool.json               IC 0.0307  RankIC 0.0383
+  test seed8_301056_steps_pool.json               IC 0.0725  RankIC 0.0887
+  test seed9_301056_steps_pool.json               IC 0.0395  RankIC 0.0502
+  test MEAN OF SEEDS  IC 0.0521  RankIC 0.0587   BEST SEED IC 0.0725
+  test ENSEMBLE       IC 0.0662  RankIC 0.0712
+
+== pool50: 5 pools
+  valid pool50_seed0_350208_steps_pool.json        IC 0.0475  RankIC 0.0477
+  valid pool50_seed1_350208_steps_pool.json        IC -0.0090  RankIC -0.0009
+  valid pool50_seed2_350208_steps_pool.json        IC -0.0109  RankIC -0.0093
+  valid pool50_seed3_350208_steps_pool.json        IC 0.0173  RankIC 0.0406
+  valid pool50_seed4_350208_steps_pool.json        IC 0.0431  RankIC 0.0465
+  valid MEAN OF SEEDS  IC 0.0176  RankIC 0.0249   BEST SEED IC 0.0475
+  valid ENSEMBLE       IC 0.0233  RankIC 0.0293
+  test pool50_seed0_350208_steps_pool.json        IC 0.0610  RankIC 0.0741
+  test pool50_seed1_350208_steps_pool.json        IC 0.0393  RankIC 0.0487
+  test pool50_seed2_350208_steps_pool.json        IC 0.0429  RankIC 0.0494
+  test pool50_seed3_350208_steps_pool.json        IC 0.0607  RankIC 0.0591
+  test pool50_seed4_350208_steps_pool.json        IC 0.0848  RankIC 0.0883
+  test MEAN OF SEEDS  IC 0.0577  RankIC 0.0639   BEST SEED IC 0.0848
+  test ENSEMBLE       IC 0.0720  RankIC 0.0743
+
+== pool100: 10 pools
+  valid pool100_seed0_401408_steps_pool.json       IC 0.0266  RankIC 0.0386
+  valid pool100_seed1_401408_steps_pool.json       IC 0.0272  RankIC 0.0334
+  valid pool100_seed2_401408_steps_pool.json       IC 0.0195  RankIC 0.0337
+  valid pool100_seed3_401408_steps_pool.json       IC 0.0178  RankIC -0.0018
+  valid pool100_seed4_401408_steps_pool.json       IC 0.0005  RankIC 0.0104
+  valid pool100_seed5_401408_steps_pool.json       IC 0.0060  RankIC 0.0224
+  valid pool100_seed6_401408_steps_pool.json       IC 0.0256  RankIC 0.0320
+  valid pool100_seed7_401408_steps_pool.json       IC -0.0199  RankIC -0.0081
+  valid pool100_seed8_401408_steps_pool.json       IC 0.0213  RankIC 0.0193
+  valid pool100_seed9_401408_steps_pool.json       IC 0.0305  RankIC 0.0443
+  valid MEAN OF SEEDS  IC 0.0155  RankIC 0.0224   BEST SEED IC 0.0305
+  valid ENSEMBLE       IC 0.0196  RankIC 0.0262
+  test pool100_seed0_401408_steps_pool.json       IC 0.0749  RankIC 0.0780
+  test pool100_seed1_401408_steps_pool.json       IC 0.0548  RankIC 0.0605
+  test pool100_seed2_401408_steps_pool.json       IC 0.0717  RankIC 0.0725
+  test pool100_seed3_401408_steps_pool.json       IC 0.0513  RankIC 0.0655
+  test pool100_seed4_401408_steps_pool.json       IC 0.0560  RankIC 0.0620
+  test pool100_seed5_401408_steps_pool.json       IC 0.0563  RankIC 0.0627
+  test pool100_seed6_401408_steps_pool.json       IC 0.0587  RankIC 0.0555
+  test pool100_seed7_401408_steps_pool.json       IC 0.0479  RankIC 0.0484
+  test pool100_seed8_401408_steps_pool.json       IC 0.0566  RankIC 0.0601
+  test pool100_seed9_401408_steps_pool.json       IC 0.0636  RankIC 0.0709
+  test MEAN OF SEEDS  IC 0.0592  RankIC 0.0636   BEST SEED IC 0.0749
+  test ENSEMBLE       IC 0.0752  RankIC 0.0791
+
+== pool20_50_100: 25 pools
+  valid seed0_301056_steps_pool.json               IC 0.0411  RankIC 0.0512
+  valid seed1_301056_steps_pool.json               IC -0.0161  RankIC -0.0056
+  valid seed2_301056_steps_pool.json               IC 0.0193  RankIC 0.0287
+  valid seed3_301056_steps_pool.json               IC 0.0097  RankIC 0.0220
+  valid seed4_301056_steps_pool.json               IC 0.0524  RankIC 0.0514
+  valid seed5_301056_steps_pool.json               IC -0.0213  RankIC -0.0110
+  valid seed6_301056_steps_pool.json               IC 0.0083  RankIC 0.0259
+  valid seed7_301056_steps_pool.json               IC -0.0136  RankIC 0.0076
+  valid seed8_301056_steps_pool.json               IC 0.0355  RankIC 0.0536
+  valid seed9_301056_steps_pool.json               IC 0.0397  RankIC 0.0431
+  valid pool100_seed0_401408_steps_pool.json       IC 0.0266  RankIC 0.0386
+  valid pool100_seed1_401408_steps_pool.json       IC 0.0272  RankIC 0.0334
+  valid pool100_seed2_401408_steps_pool.json       IC 0.0195  RankIC 0.0337
+  valid pool100_seed3_401408_steps_pool.json       IC 0.0178  RankIC -0.0018
+  valid pool100_seed4_401408_steps_pool.json       IC 0.0005  RankIC 0.0104
+  valid pool100_seed5_401408_steps_pool.json       IC 0.0060  RankIC 0.0224
+  valid pool100_seed6_401408_steps_pool.json       IC 0.0256  RankIC 0.0320
+  valid pool100_seed7_401408_steps_pool.json       IC -0.0199  RankIC -0.0081
+  valid pool100_seed8_401408_steps_pool.json       IC 0.0213  RankIC 0.0193
+  valid pool100_seed9_401408_steps_pool.json       IC 0.0305  RankIC 0.0443
+  valid pool50_seed0_350208_steps_pool.json        IC 0.0475  RankIC 0.0477
+  valid pool50_seed1_350208_steps_pool.json        IC -0.0090  RankIC -0.0009
+  valid pool50_seed2_350208_steps_pool.json        IC -0.0109  RankIC -0.0093
+  valid pool50_seed3_350208_steps_pool.json        IC 0.0173  RankIC 0.0406
+  valid pool50_seed4_350208_steps_pool.json        IC 0.0431  RankIC 0.0465
+  valid MEAN OF SEEDS  IC 0.0159  RankIC 0.0246   BEST SEED IC 0.0524
+  valid ENSEMBLE       IC 0.0223  RankIC 0.0301
+  test seed0_301056_steps_pool.json               IC 0.0574  RankIC 0.0706
+  test seed1_301056_steps_pool.json               IC 0.0456  RankIC 0.0452
+  test seed2_301056_steps_pool.json               IC 0.0437  RankIC 0.0410
+  test seed3_301056_steps_pool.json               IC 0.0687  RankIC 0.0790
+  test seed4_301056_steps_pool.json               IC 0.0554  RankIC 0.0588
+  test seed5_301056_steps_pool.json               IC 0.0509  RankIC 0.0517
+  test seed6_301056_steps_pool.json               IC 0.0570  RankIC 0.0639
+  test seed7_301056_steps_pool.json               IC 0.0307  RankIC 0.0383
+  test seed8_301056_steps_pool.json               IC 0.0725  RankIC 0.0887
+  test seed9_301056_steps_pool.json               IC 0.0395  RankIC 0.0502
+  test pool100_seed0_401408_steps_pool.json       IC 0.0749  RankIC 0.0780
+  test pool100_seed1_401408_steps_pool.json       IC 0.0548  RankIC 0.0605
+  test pool100_seed2_401408_steps_pool.json       IC 0.0717  RankIC 0.0725
+  test pool100_seed3_401408_steps_pool.json       IC 0.0513  RankIC 0.0655
+  test pool100_seed4_401408_steps_pool.json       IC 0.0560  RankIC 0.0620
+  test pool100_seed5_401408_steps_pool.json       IC 0.0563  RankIC 0.0627
+  test pool100_seed6_401408_steps_pool.json       IC 0.0587  RankIC 0.0555
+  test pool100_seed7_401408_steps_pool.json       IC 0.0479  RankIC 0.0484
+  test pool100_seed8_401408_steps_pool.json       IC 0.0566  RankIC 0.0601
+  test pool100_seed9_401408_steps_pool.json       IC 0.0636  RankIC 0.0709
+  test pool50_seed0_350208_steps_pool.json        IC 0.0610  RankIC 0.0741
+  test pool50_seed1_350208_steps_pool.json        IC 0.0393  RankIC 0.0487
+  test pool50_seed2_350208_steps_pool.json        IC 0.0429  RankIC 0.0494
+  test pool50_seed3_350208_steps_pool.json        IC 0.0607  RankIC 0.0591
+  test pool50_seed4_350208_steps_pool.json        IC 0.0848  RankIC 0.0883
+  test MEAN OF SEEDS  IC 0.0561  RankIC 0.0617   BEST SEED IC 0.0848
+  test ENSEMBLE       IC 0.0743  RankIC 0.0763
+
+== transformer: 5 pools
+  valid seed0_301056_steps_pool.json               IC -0.0187  RankIC -0.0085
+  valid seed1_301056_steps_pool.json               IC 0.0246  RankIC 0.0209
+  valid seed2_301056_steps_pool.json               IC -0.0055  RankIC -0.0002
+  valid seed3_301056_steps_pool.json               IC -0.0077  RankIC 0.0250
+  valid seed4_301056_steps_pool.json               IC 0.0111  RankIC 0.0219
+  valid MEAN OF SEEDS  IC 0.0008  RankIC 0.0118   BEST SEED IC 0.0246
+  valid ENSEMBLE       IC 0.0027  RankIC 0.0149
+  test seed0_301056_steps_pool.json               IC 0.0467  RankIC 0.0395
+  test seed1_301056_steps_pool.json               IC 0.0486  RankIC 0.0576
+  test seed2_301056_steps_pool.json               IC 0.0320  RankIC 0.0208
+  test seed3_301056_steps_pool.json               IC 0.0490  RankIC 0.0594
+  test seed4_301056_steps_pool.json               IC 0.0656  RankIC 0.0728
+  test MEAN OF SEEDS  IC 0.0484  RankIC 0.0500   BEST SEED IC 0.0656
+  test ENSEMBLE       IC 0.0637  RankIC 0.0653
+
+== lstm_fix: 5 pools
+  valid seed0_301056_steps_pool.json               IC -0.0068  RankIC -0.0237
+  valid seed1_301056_steps_pool.json               IC 0.0122  RankIC 0.0218
+  valid seed2_301056_steps_pool.json               IC 0.0228  RankIC 0.0288
+  valid seed3_301056_steps_pool.json               IC 0.0289  RankIC 0.0350
+  valid seed4_301056_steps_pool.json               IC -0.0285  RankIC -0.0101
+  valid MEAN OF SEEDS  IC 0.0057  RankIC 0.0104   BEST SEED IC 0.0289
+  valid ENSEMBLE       IC 0.0075  RankIC 0.0146
+  test seed0_301056_steps_pool.json               IC 0.0341  RankIC 0.0314
+  test seed1_301056_steps_pool.json               IC 0.0331  RankIC 0.0460
+  test seed2_301056_steps_pool.json               IC 0.0551  RankIC 0.0593
+  test seed3_301056_steps_pool.json               IC 0.0447  RankIC 0.0438
+  test seed4_301056_steps_pool.json               IC 0.0266  RankIC 0.0475
+  test MEAN OF SEEDS  IC 0.0387  RankIC 0.0456   BEST SEED IC 0.0551
+  test ENSEMBLE       IC 0.0476  RankIC 0.0575
+
+== csi500_pool20: 10 pools
+  valid seed0_301056_steps_pool.json               IC -0.0052  RankIC -0.0111
+  valid seed1_301056_steps_pool.json               IC 0.0303  RankIC 0.0230
+  valid seed2_301056_steps_pool.json               IC -0.0017  RankIC -0.0001
+  valid seed3_301056_steps_pool.json               IC -0.0188  RankIC -0.0201
+  valid seed4_301056_steps_pool.json               IC 0.0073  RankIC -0.0043
+  valid seed5_301056_steps_pool.json               IC 0.0001  RankIC -0.0054
+  valid seed6_301056_steps_pool.json               IC 0.0085  RankIC 0.0025
+  valid seed7_301056_steps_pool.json               IC -0.0150  RankIC -0.0206
+  valid seed8_301056_steps_pool.json               IC 0.0130  RankIC 0.0115
+  valid seed9_301056_steps_pool.json               IC 0.0099  RankIC 0.0031
+  valid MEAN OF SEEDS  IC 0.0028  RankIC -0.0021   BEST SEED IC 0.0303
+  valid ENSEMBLE       IC 0.0035  RankIC -0.0006
+  test seed0_301056_steps_pool.json               IC 0.0260  RankIC 0.0391
+  test seed1_301056_steps_pool.json               IC 0.0326  RankIC 0.0440
+  test seed2_301056_steps_pool.json               IC 0.0346  RankIC 0.0482
+  test seed3_301056_steps_pool.json               IC 0.0193  RankIC 0.0354
+  test seed4_301056_steps_pool.json               IC 0.0348  RankIC 0.0384
+  test seed5_301056_steps_pool.json               IC 0.0294  RankIC 0.0338
+  test seed6_301056_steps_pool.json               IC 0.0299  RankIC 0.0471
+  test seed7_301056_steps_pool.json               IC 0.0442  RankIC 0.0451
+  test seed8_301056_steps_pool.json               IC 0.0398  RankIC 0.0534
+  test seed9_301056_steps_pool.json               IC 0.0320  RankIC 0.0457
+  test MEAN OF SEEDS  IC 0.0323  RankIC 0.0430   BEST SEED IC 0.0442
+  test ENSEMBLE       IC 0.0368  RankIC 0.0501

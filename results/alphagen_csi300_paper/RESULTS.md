@@ -3,9 +3,10 @@
 Reproduction of AlphaGen (Yu et al., KDD 2023, arXiv 2306.12964) on the ICM Rysy cluster,
 with the paper's data split, target, hyperparameters and step count.
 
-Status on 2026-11-11 11:30: CSI300 complete at pool 20 and pool 100 (10 seeds each), CSI500
-complete at pool 20 (10 seeds), reward-0 test complete (3 seeds), transformer and fixed-LSTM
-runs done for seeds 0–4. CSI500 at pool 100 and fixed-LSTM seeds 5–9 are training.
+Status on 2026-11-12 08:30: CSI300 complete at pool 20 and pool 100 (10 seeds each), CSI500
+complete at pool 20 (10 seeds), reward-0 test complete (3 seeds), transformer runs done for
+seeds 0–4, seed ensembles scored. Training: CSI500 at pool 100 (4 of 10 seeds done),
+fixed-LSTM seeds 8–9, and the transformer at pool 100 on CSI300 (10 seeds, jobs 215491 on).
 
 ## Setup
 
@@ -146,6 +147,31 @@ Per seed (test IC / Rank IC):
 - CSI500 at pool 100 is training (jobs 215208, 215411).
 - Pool 100 runs take 18–24 h on a V100, against 7–12 h at pool 20.
 
+## Seed ensemble
+
+The final pools of all seeds combined into one predictor (`scripts/ensemble.py`, job 215453,
+output in `ensemble_scores.txt`): each pool's prediction (weighted sum of its day-normalised
+alphas) is normalised by day, then the seeds are averaged with equal weight. The single-pool
+scores it prints match the training logs exactly. Test 2020–2021, IC / Rank IC:
+
+| Group | Pools | Mean of seeds | Best seed (IC) | Ensemble |
+|---|---|---|---|---|
+| CSI300 pool 20 | 10 | 0.0521 / 0.0587 | 0.0725 | 0.0662 / 0.0712 |
+| CSI300 pool 50 | 5 | 0.0577 / 0.0639 | 0.0848 | 0.0720 / 0.0743 |
+| CSI300 pool 100 | 10 | 0.0592 / 0.0636 | 0.0749 | **0.0752 / 0.0791** |
+| CSI300 pools 20 + 50 + 100 | 25 | 0.0561 / 0.0617 | 0.0848 | 0.0743 / 0.0763 |
+| CSI300 transformer + fix, pool 20 | 5 | 0.0484 / 0.0500 | 0.0656 | 0.0637 / 0.0653 |
+| CSI300 LSTM + fix, pool 20 | 5 | 0.0387 / 0.0456 | 0.0551 | 0.0476 / 0.0575 |
+| CSI500 pool 20 | 10 | 0.0323 / 0.0430 | 0.0442 | 0.0368 / 0.0501 |
+
+- Averaging seeds adds 0.009–0.016 IC on CSI300 in every group. The 10-seed ensemble at pool 100
+  (0.0752 / 0.0791) is at the paper's "Ours\*" (0.0725 / 0.0806). That is a different quantity
+  from the paper's mean over runs: it uses 10 training runs for one predictor.
+- The gain is smaller on CSI500 (+0.0045 IC, +0.0071 Rank IC).
+- Validation IC (2019) also rises with the ensemble but stays near 0.02, so picking checkpoints
+  or seeds by validation IC is unlikely to be reliable.
+- Adding pool 20 and 50 to the pool-100 seeds does not help (0.0743 against 0.0752).
+
 ## Transformer policy (first results)
 
 `ALPHAGEN_POLICY=transformer` replaces the LSTM with `TransformerSharedNet` of similar size
@@ -195,8 +221,10 @@ Paired over seeds 0–4 (test IC):
 
 1. CSI500 at pool 100, 10 seeds (running), to finish the reproduction on both universes.
 2. Fixed LSTM seeds 5–9 (running), to settle whether the observation fix matters.
-3. Main comparison: LSTM vs transformer at pool 100, 10 seeds each, on CSI300 then CSI500,
-   with the observation setting chosen after step 2.
+3. Main comparison: LSTM vs transformer at pool 100, 10 seeds each, on CSI300 then CSI500.
+   The transformer runs on CSI300 are queued (`RUN_TAG=tf POOL=100`); the LSTM side is the
+   existing pool-100 runs.
+4. Compare the policies as seed ensembles too, since that is the strongest predictor so far.
 
 ## Files
 
@@ -207,3 +235,5 @@ Paired over seeds 0–4 (test IC):
 - `pools_transformer/seed<N>_301056_steps_pool.json`: final pools of the transformer runs
 - `pools_fix/seed<N>_301056_steps_pool.json`: final pools of the LSTM runs with the observation fix
 - `pools_olddata/seed{0,1,2}.json`: final pools of the earlier runs on the uncorrected data
+- `ensemble_scores.txt`: output of the seed-ensemble scoring (`scripts/ensemble.py`,
+  `scripts/rysy/ensemble.sbatch`)
